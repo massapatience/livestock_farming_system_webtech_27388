@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Animals - Livestock Farming Management System</title>
+    <h:outputStylesheet library="css" name="style.css"/>
+    <h:outputScript library="js" name="validation.js"/>
+</h:head>
+<h:body>
+    <div class="app-header">
+        <h1>Livestock Farming Management System</h1>
+    </div>
+    <div class="app-nav">
+        <h:outputLink value="../index.xhtml">Home</h:outputLink>
+        <h:outputLink value="animalList.xhtml">Animals</h:outputLink>
+        <h:outputLink value="../health/healthList.xhtml">Health Records</h:outputLink>
+    </div>
+
+    <div class="content-wrapper">
+        <h2>Registered Animals</h2>
+
+        <h:form id="animalListForm">
+            <h:commandLink value="+ Register New Animal" styleClass="btn"
+                            action="#{animalBean.newAnimal}"/>
+
+            <h:dataTable value="#{animalBean.animalList}" var="a"
+                         styleClass="data-table" rendered="#{not empty animalBean.animalList}">
+                <h:column>
+                    <f:facet name="header">Tag No.</f:facet>
+                    #{a.tagNumber}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Species</f:facet>
+                    #{a.species}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Breed</f:facet>
+                    #{a.breed}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Date of Birth</f:facet>
+                    <h:outputText value="#{a.dateOfBirth}">
+                        <f:convertDateTime pattern="dd-MM-yyyy"/>
+                    </h:outputText>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Weight (kg)</f:facet>
+                    #{a.weightKg}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Health Status</f:facet>
+                    #{a.healthStatus}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Farmer</f:facet>
+                    #{a.farmer.fullName}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Actions</f:facet>
+                    <h:commandLink value="Edit" action="#{animalBean.edit(a.id)}"/>
+                    &#160;|&#160;
+                    <h:commandLink value="Delete" action="#{animalBean.delete(a.id)}"
+                                    onclick="return confirmDelete('#{a.tagNumber}')"/>
+                </h:column>
+            </h:dataTable>
+
+            <h:outputText value="No animals registered yet." rendered="#{empty animalBean.animalList}"/>
+        </h:form>
+    </div>
+</h:body>
+</html>

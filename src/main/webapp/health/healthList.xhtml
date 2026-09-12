@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Health Records - Livestock Farming Management System</title>
+    <h:outputStylesheet library="css" name="style.css"/>
+    <h:outputScript library="js" name="validation.js"/>
+</h:head>
+<h:body>
+    <div class="app-header">
+        <h1>Livestock Farming Management System</h1>
+    </div>
+    <div class="app-nav">
+        <h:outputLink value="../index.xhtml">Home</h:outputLink>
+        <h:outputLink value="../animals/animalList.xhtml">Animals</h:outputLink>
+        <h:outputLink value="healthList.xhtml">Health Records</h:outputLink>
+    </div>
+
+    <div class="content-wrapper">
+        <h2>Veterinary Health Records</h2>
+
+        <h:form id="healthListForm">
+            <h:commandLink value="+ Add Health Record" styleClass="btn"
+                            action="#{healthRecordBean.newHealthRecord}"/>
+
+            <h:dataTable value="#{healthRecordBean.healthRecordList}" var="hr"
+                         styleClass="data-table" rendered="#{not empty healthRecordBean.healthRecordList}">
+                <h:column>
+                    <f:facet name="header">Animal Tag</f:facet>
+                    #{hr.animal.tagNumber}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Visit Date</f:facet>
+                    <h:outputText value="#{hr.visitDate}">
+                        <f:convertDateTime pattern="dd-MM-yyyy"/>
+                    </h:outputText>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Diagnosis</f:facet>
+                    #{hr.diagnosis}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Treatment</f:facet>
+                    #{hr.treatment}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Veterinarian</f:facet>
+                    #{hr.veterinarian}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Actions</f:facet>
+                    <h:commandLink value="Edit" action="#{healthRecordBean.edit(hr.id)}"/>
+                    &#160;|&#160;
+                    <h:commandLink value="Delete" action="#{healthRecordBean.delete(hr.id)}"
+                                    onclick="return confirmDelete('record for ' + '#{hr.animal.tagNumber}')"/>
+                </h:column>
+            </h:dataTable>
+
+            <h:outputText value="No health records yet." rendered="#{empty healthRecordBean.healthRecordList}"/>
+        </h:form>
+    </div>
+</h:body>
+</html>

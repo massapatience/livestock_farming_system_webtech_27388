@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Health Record Form - Livestock Farming Management System</title>
+    <h:outputStylesheet library="css" name="style.css"/>
+</h:head>
+<h:body>
+    <div class="app-header">
+        <h1>Livestock Farming Management System</h1>
+    </div>
+    <div class="app-nav">
+        <h:outputLink value="../index.xhtml">Home</h:outputLink>
+        <h:outputLink value="../animals/animalList.xhtml">Animals</h:outputLink>
+        <h:outputLink value="healthList.xhtml">Health Records</h:outputLink>
+    </div>
+
+    <div class="content-wrapper">
+        <h2>#{healthRecordBean.healthRecord.id == null ? 'Add Health Record' : 'Edit Health Record'}</h2>
+
+        <h:form id="healthForm">
+            <h:messages globalOnly="false" styleClass="error-text" layout="table"/>
+
+            <div class="form-row">
+                <h:outputLabel for="animal" value="Animal"/>
+                <h:selectOneMenu id="animal" value="#{healthRecordBean.healthRecord.animal}"
+                                  converter="#{animalConverter}" required="true">
+                    <f:selectItem itemLabel="-- Select animal --" itemValue="#{null}"/>
+                    <f:selectItems value="#{healthRecordBean.animalOptions}" var="a"
+                                    itemLabel="#{a.tagNumber} (#{a.species})" itemValue="#{a}"/>
+                </h:selectOneMenu>
+                <h:message for="animal" styleClass="error-text"/>
+            </div>
+
+            <div class="form-row">
+                <h:outputLabel for="visitDate" value="Visit Date"/>
+                <h:inputText id="visitDate" value="#{healthRecordBean.healthRecord.visitDate}" required="true"
+                             a:type="date" xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+                    <f:convertDateTime pattern="yyyy-MM-dd"/>
+                </h:inputText>
+                <h:message for="visitDate" styleClass="error-text"/>
+            </div>
+
+            <div class="form-row">
+                <h:outputLabel for="diagnosis" value="Diagnosis"/>
+                <h:inputText id="diagnosis" value="#{healthRecordBean.healthRecord.diagnosis}" required="true"/>
+                <h:message for="diagnosis" styleClass="error-text"/>
+            </div>
+
+            <div class="form-row">
+                <h:outputLabel for="treatment" value="Treatment Given"/>
+                <h:inputText id="treatment" value="#{healthRecordBean.healthRecord.treatment}" required="true"/>
+                <h:message for="treatment" styleClass="error-text"/>
+            </div>
+
+            <div class="form-row">
+                <h:outputLabel for="vet" value="Veterinarian"/>
+                <h:inputText id="vet" value="#{healthRecordBean.healthRecord.veterinarian}" required="true"/>
+                <h:message for="vet" styleClass="error-text"/>
+            </div>
+
+            <h:commandButton value="Save" action="#{healthRecordBean.save}" styleClass="btn"/>
+            &#160;
+            <h:commandLink value="Cancel" action="healthList?faces-redirect=true"/>
+        </h:form>
+    </div>
+</h:body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+<h:head>
+    <title>Livestock Farming Management System</title>
+    <h:outputStylesheet library="css" name="style.css"/>
+    <!-- internal style block: demonstrates the second CSS technique used in this project -->
+    <style>
+        .welcome-banner {
+            background: linear-gradient(90deg, #3c6e47, #6ea36f);
+            color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .welcome-banner h2 {
+            margin-top: 0;
+        }
+        .quick-links {
+            display: flex;
+            gap: 16px;
+            margin-top: 20px;
+        }
+    </style>
+</h:head>
+<h:body>
+    <div class="app-header">
+        <h1>Livestock Farming Management System</h1>
+    </div>
+    <div class="app-nav">
+        <h:outputLink value="animals/animalList.xhtml">Animals</h:outputLink>
+        <h:outputLink value="health/healthList.xhtml">Health Records</h:outputLink>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="welcome-banner">
+            <h2>Welcome</h2>
+            <p>Track farmers, animals, feeding, and veterinary health records in one place.</p>
+        </div>
+
+        <!-- inline style attribute: demonstrates the third CSS technique used in this project -->
+        <p style="color:#3c6e47; font-weight:600;">
+            Use the navigation bar above to manage animals and their health records.
+        </p>
+
+        <div class="quick-links">
+            <h:outputLink styleClass="btn" value="animals/animalList.xhtml">
+                Go to Animals
+            </h:outputLink>
+            <h:outputLink styleClass="btn" value="health/healthList.xhtml">
+                Go to Health Records
+            </h:outputLink>
+        </div>
+    </div>
+</h:body>
+</html>

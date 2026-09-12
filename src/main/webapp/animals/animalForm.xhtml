@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Animal Form - Livestock Farming Management System</title>
+    <h:outputStylesheet library="css" name="style.css"/>
+    <h:outputScript library="js" name="validation.js"/>
+</h:head>
+<h:body>
+    <div class="app-header">
+        <h1>Livestock Farming Management System</h1>
+    </div>
+    <div class="app-nav">
+        <h:outputLink value="../index.xhtml">Home</h:outputLink>
+        <h:outputLink value="animalList.xhtml">Animals</h:outputLink>
+        <h:outputLink value="../health/healthList.xhtml">Health Records</h:outputLink>
+    </div>
+
+    <div class="content-wrapper">
+        <h2>#{animalBean.animal.id == null ? 'Register New Animal' : 'Edit Animal'}</h2>
+
+        <h:form id="animalForm">
+            <!-- Bean Validation (JSR-380) messages, enforced server-side via annotations on Animal.java -->
+            <h:messages globalOnly="false" styleClass="error-text" layout="table"/>
+
+            <div class="form-row">
+                <h:outputLabel for="tagNumber" value="Tag Number"/>
+                <h:inputText id="tagNumber" value="#{animalBean.animal.tagNumber}"
+                             required="true" requiredMessage="Tag number is required."/>
+                <h:message for="tagNumber" styleClass="error-text"/>
+            </div>
+
+            <div class="form-row">
+                <h:outputLabel for="species" value="Species"/>
+                <h:selectOneMenu id="species" value="#{animalBean.animal.species}" required="true">
+                    <f:selectItem itemLabel="-- Select species --" itemValue=""/>
+                    <f:selectItem itemLabel="Cattle" itemValue="Cattle"/>
+                    <f:selectItem itemLabel="Goat" itemValue="Goat"/>
+                    <f:selectItem itemLabel="Sheep" itemValue="Sheep"/>
+                    <f:selectItem itemLabel="Pig" itemValue="Pig"/>
+                    <f:selectItem itemLabel="Poultry" itemValue="Poultry"/>
+                </h:selectOneMenu>
+                <h:message for="species" styleClass="error-text"/>
+            </div>
+
+            <div class="form-row">
+                <h:outputLabel for="breed" value="Breed"/>
+                <h:inputText id="breed" value="#{animalBean.animal.breed}" required="true"/>
+                <h:message for="breed" styleClass="error-text"/>
+            </div>
+
+            <div class="form-row">
+                <h:outputLabel for="dob" value="Date of Birth"/>
+                <!-- HTML5 validation: native date picker constrains input format in the browser -->
+                <h:inputText id="dob" value="#{animalBean.animal.dateOfBirth}" required="true"
+                             a:type="date" xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+                    <f:convertDateTime pattern="yyyy-MM-dd"/>
+                </h:inputText>
+                <h:message for="dob" styleClass="error-text"/>
+            </div>
+
+            <div class="form-row">
+                <h:outputLabel for="weight" value="Weight (kg)"/>
+                <!-- JavaScript validation: live client-side hint as the farmer types, on top of
+                     the server-side @DecimalMin check on Animal.weightKg -->
+                <h:inputText id="weight" value="#{animalBean.animal.weightKg}" required="true"
+                             onkeyup="validateWeightField(this)"/>
+                <span id="weight-jsWarning" class="error-text" style="display:none;"/>
+                <h:message for="weight" styleClass="error-text"/>
+            </div>
+
+            <div class="form-row">
+                <h:outputLabel for="healthStatus" value="Health Status"/>
+                <h:selectOneMenu id="healthStatus" value="#{animalBean.animal.healthStatus}" required="true">
+                    <f:selectItem itemLabel="-- Select status --" itemValue=""/>
+                    <f:selectItem itemLabel="Healthy" itemValue="Healthy"/>
+                    <f:selectItem itemLabel="Under Treatment" itemValue="Under Treatment"/>
+                    <f:selectItem itemLabel="Sick" itemValue="Sick"/>
+                    <f:selectItem itemLabel="Quarantined" itemValue="Quarantined"/>
+                </h:selectOneMenu>
+                <h:message for="healthStatus" styleClass="error-text"/>
+            </div>
+
+            <div class="form-row">
+                <h:outputLabel for="farmer" value="Owning Farmer"/>
+                <h:selectOneMenu id="farmer" value="#{animalBean.animal.farmer}"
+                                  converter="#{farmerConverter}" required="true">
+                    <f:selectItem itemLabel="-- Select farmer --" itemValue="#{null}"/>
+                    <f:selectItems value="#{animalBean.farmerList}" var="f"
+                                    itemLabel="#{f.fullName}" itemValue="#{f}"/>
+                </h:selectOneMenu>
+                <h:message for="farmer" styleClass="error-text"/>
+            </div>
+
+            <h:commandButton value="Save" action="#{animalBean.save}" styleClass="btn"/>
+            &#160;
+            <h:commandLink value="Cancel" action="animalList?faces-redirect=true"/>
+        </h:form>
+    </div>
+</h:body>
+</html>
