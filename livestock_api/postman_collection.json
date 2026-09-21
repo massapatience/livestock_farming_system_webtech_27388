@@ -1,0 +1,373 @@
+{
+  "info": {
+    "name": "Livestock Farming Management API",
+    "description": "CRUD + business logic validation tests for Farmer, Animal, and HealthRecord endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8081" },
+    { "key": "farmerId", "value": "" },
+    { "key": "animalId", "value": "" },
+    { "key": "healthRecordId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Farmer",
+      "item": [
+        {
+          "name": "1. Create Farmer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('farmerId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Jane Uwase\",\n  \"phoneNumber\": \"0788123456\",\n  \"farmLocation\": \"Musanze\"\n}"
+            },
+            "url": "{{baseUrl}}/api/farmers"
+          }
+        },
+        {
+          "name": "2. Create Farmer - Duplicate Phone (expect 422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422 (business rule: duplicate phone)', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Second Farmer\",\n  \"phoneNumber\": \"0788123456\",\n  \"farmLocation\": \"Huye\"\n}"
+            },
+            "url": "{{baseUrl}}/api/farmers"
+          }
+        },
+        {
+          "name": "3. Create Farmer - Missing Fields (expect 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 400 (bean validation)', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"\"\n}" },
+            "url": "{{baseUrl}}/api/farmers"
+          }
+        },
+        {
+          "name": "4. Get All Farmers",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/farmers" }
+        },
+        {
+          "name": "5. Get Farmer By Id",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/farmers/{{farmerId}}" }
+        },
+        {
+          "name": "6. Update Farmer",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Jane Uwase Mukamana\",\n  \"phoneNumber\": \"0788123456\",\n  \"farmLocation\": \"Musanze\"\n}"
+            },
+            "url": "{{baseUrl}}/api/farmers/{{farmerId}}"
+          }
+        },
+        {
+          "name": "7. Delete Farmer - Blocked While Owning Animals (expect 422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422 (business rule: farmer still owns animals)', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/farmers/{{farmerId}}" }
+        }
+      ]
+    },
+    {
+      "name": "Animal",
+      "item": [
+        {
+          "name": "1. Create Animal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('animalId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tagNumber\": \"COW-001\",\n  \"species\": \"Cattle\",\n  \"breed\": \"Ankole\",\n  \"dateOfBirth\": \"2023-01-15\",\n  \"weightKg\": 320.5,\n  \"healthStatus\": \"Healthy\"\n}"
+            },
+            "url": "{{baseUrl}}/api/animals?farmerId={{farmerId}}"
+          }
+        },
+        {
+          "name": "2. Create Animal - Duplicate Tag (expect 422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422 (business rule: duplicate tag number)', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tagNumber\": \"COW-001\",\n  \"species\": \"Cattle\",\n  \"breed\": \"Friesian\",\n  \"dateOfBirth\": \"2022-05-01\",\n  \"weightKg\": 280,\n  \"healthStatus\": \"Healthy\"\n}"
+            },
+            "url": "{{baseUrl}}/api/animals?farmerId={{farmerId}}"
+          }
+        },
+        {
+          "name": "3. Create Animal - Invalid Species (expect 422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422 (business rule: species not in allowed list)', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tagNumber\": \"DOG-001\",\n  \"species\": \"Dog\",\n  \"breed\": \"Mixed\",\n  \"dateOfBirth\": \"2022-05-01\",\n  \"weightKg\": 20,\n  \"healthStatus\": \"Healthy\"\n}"
+            },
+            "url": "{{baseUrl}}/api/animals?farmerId={{farmerId}}"
+          }
+        },
+        {
+          "name": "4. Create Animal - Nonexistent Farmer (expect 404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 404 (farmer does not exist)', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tagNumber\": \"GOAT-999\",\n  \"species\": \"Goat\",\n  \"breed\": \"Boer\",\n  \"dateOfBirth\": \"2023-03-01\",\n  \"weightKg\": 45,\n  \"healthStatus\": \"Healthy\"\n}"
+            },
+            "url": "{{baseUrl}}/api/animals?farmerId=999999"
+          }
+        },
+        {
+          "name": "5. Get All Animals",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/animals" }
+        },
+        {
+          "name": "6. Get Animal By Id",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/animals/{{animalId}}" }
+        },
+        {
+          "name": "7. Update Animal",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tagNumber\": \"COW-001\",\n  \"species\": \"Cattle\",\n  \"breed\": \"Ankole\",\n  \"dateOfBirth\": \"2023-01-15\",\n  \"weightKg\": 335,\n  \"healthStatus\": \"Under Treatment\"\n}"
+            },
+            "url": "{{baseUrl}}/api/animals/{{animalId}}"
+          }
+        },
+        {
+          "name": "8. Delete Animal - Blocked With Health Records (expect 422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422 (business rule: animal has health records)', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/animals/{{animalId}}" }
+        }
+      ]
+    },
+    {
+      "name": "HealthRecord",
+      "item": [
+        {
+          "name": "1. Create Health Record",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('healthRecordId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visitDate\": \"2026-08-10\",\n  \"diagnosis\": \"Routine checkup\",\n  \"treatment\": \"Deworming\",\n  \"veterinarian\": \"Dr. Mugisha\"\n}"
+            },
+            "url": "{{baseUrl}}/api/health-records?animalId={{animalId}}"
+          }
+        },
+        {
+          "name": "2. Create Health Record - Visit Before Birth (expect 422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422 (business rule: visit date before date of birth)', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visitDate\": \"2020-01-01\",\n  \"diagnosis\": \"Impossible visit\",\n  \"treatment\": \"N/A\",\n  \"veterinarian\": \"Dr. Mugisha\"\n}"
+            },
+            "url": "{{baseUrl}}/api/health-records?animalId={{animalId}}"
+          }
+        },
+        {
+          "name": "3. Create Health Record - Nonexistent Animal (expect 404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 404 (animal does not exist)', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visitDate\": \"2026-08-10\",\n  \"diagnosis\": \"Test\",\n  \"treatment\": \"Test\",\n  \"veterinarian\": \"Dr. Test\"\n}"
+            },
+            "url": "{{baseUrl}}/api/health-records?animalId=999999"
+          }
+        },
+        {
+          "name": "4. Get All Health Records",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/health-records" }
+        },
+        {
+          "name": "5. Get Health Record By Id",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/health-records/{{healthRecordId}}" }
+        },
+        {
+          "name": "6. Update Health Record",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visitDate\": \"2026-08-12\",\n  \"diagnosis\": \"Routine checkup - follow up\",\n  \"treatment\": \"Deworming + vitamins\",\n  \"veterinarian\": \"Dr. Mugisha\"\n}"
+            },
+            "url": "{{baseUrl}}/api/health-records/{{healthRecordId}}"
+          }
+        },
+        {
+          "name": "7. Delete Health Record",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/health-records/{{healthRecordId}}" }
+        },
+        {
+          "name": "8. Delete Animal - Now Succeeds (expect 204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 204 (health record removed first)', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/animals/{{animalId}}" }
+        },
+        {
+          "name": "9. Delete Farmer - Now Succeeds (expect 204)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 204 (animal removed first)', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/farmers/{{farmerId}}" }
+        }
+      ]
+    }
+  ]
+}
